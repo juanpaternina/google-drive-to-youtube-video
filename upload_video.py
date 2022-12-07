@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import httplib
+import http.client as httplib
 import httplib2
 import os
 import random
@@ -54,15 +54,11 @@ YOUTUBE_API_VERSION = "v3"
 # missing.
 MISSING_CLIENT_SECRETS_MESSAGE = """
 WARNING: Please configure OAuth 2.0
-
 To make this sample run you will need to populate the client_secrets.json file
 found at:
-
    %s
-
 with information from the API Console
 https://console.developers.google.com/
-
 For more information about the client_secrets.json file format, please visit:
 https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 """ % os.path.abspath(os.path.join(os.path.dirname(__file__),
@@ -137,13 +133,13 @@ def resumable_upload(insert_request):
           print( "Video id '%s' was successfully uploaded." % response['id'])
         else:
           exit("The upload failed with an unexpected response: %s" % response)
-    except HttpError, e:
+    except HttpError as e:
       if e.resp.status in RETRIABLE_STATUS_CODES:
         error = "A retriable HTTP error %d occurred:\n%s" % (e.resp.status,
                                                              e.content)
       else:
         raise
-    except RETRIABLE_EXCEPTIONS, e:
+    except RETRIABLE_EXCEPTIONS as e:
       error = "A retriable error occurred: %s" % e
 
     if error is not None:
@@ -171,11 +167,14 @@ if __name__ == '__main__':
     default=VALID_PRIVACY_STATUSES[0], help="Video privacy status.")
   args = argparser.parse_args()
 
+  print(args.file)
+
   if not os.path.exists(args.file):
     exit("Please specify a valid file using the --file= parameter.")
 
   youtube = get_authenticated_service(args)
   try:
-    initialize_upload(youtube, args)
-  except HttpError, e:
+    # initialize_upload(youtube, args)
+    print(youtube, args)
+  except HttpError as e:
     print( "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
